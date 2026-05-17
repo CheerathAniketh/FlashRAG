@@ -1,15 +1,19 @@
-langchain
-langchain-community
-langchain-core
-langchain-text-splitters
+langchain==1.2.10
+langchain-community==0.4.0
+langchain-core==1.2.10
+langchain-text-splitters==1.0.0
+langchain-groq==0.3.6
+langchain-huggingface==1.0.0
+langchain-chroma==0.2.4
 
-chromadb
-sentence-transformers
+chromadb==1.0.15
 
-pypdf
+sentence-transformers==5.0.0
 
-groq
+pypdf==5.7.0
 
-python-dotenv
+groq==0.29.0
 
-rich
+python-dotenv==1.1.1
+
+rich==14.0.0
