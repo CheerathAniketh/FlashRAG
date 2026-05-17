@@ -2,7 +2,6 @@ from langchain_chroma import Chroma
 
 from core.embeddings import load_embedding_model
 
-
 def get_retriever():
     """
     Load ChromaDB and create retriever.

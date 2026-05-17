@@ -1,19 +1,20 @@
-langchain==1.2.10
-langchain-community==0.4.0
-langchain-core==1.2.10
-langchain-text-splitters==1.0.0
-langchain-groq==0.3.6
-langchain-huggingface==1.0.0
-langchain-chroma==0.2.4
+langchain>=0.3.14
+langchain-community>=0.3.14
+langchain-core>=0.3.60
+langchain-text-splitters>=0.3.3
 
-chromadb==1.0.15
+langchain-huggingface>=0.1.2
+langchain-chroma>=0.2.4
+langchain-groq>=1.1.2
 
-sentence-transformers==5.0.0
+chromadb>=1.5.9
 
-pypdf==5.7.0
+sentence-transformers>=3.2.1
 
-groq==0.29.0
+pypdf>=5.3.1
 
-python-dotenv==1.1.1
+groq>=0.10.0
 
-rich==14.0.0
+python-dotenv>=1.0.1
+
+rich>=14.0.0
