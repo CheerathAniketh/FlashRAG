@@ -148,6 +148,7 @@ async def health() -> HealthResponse:
     """
     Health check endpoint - Returns service status and indexed chunks count.
     
+    Queries ChromaDB to get the actual number of indexed chunks.
     Returns:
         HealthResponse: Service status and number of indexed chunks
         
@@ -158,12 +159,8 @@ async def health() -> HealthResponse:
         # Get the RAG pipeline to ensure all components are loaded
         pipeline = get_rag_pipeline()
         
-        # Try to get indexed chunks count
-        try:
-            indexed_chunks = pipeline.get_indexed_chunks_count()
-        except Exception:
-            # If we can't get the count, return 0
-            indexed_chunks = 0
+        # Get indexed chunks count from ChromaDB
+        indexed_chunks = pipeline.get_indexed_chunks_count()
         
         return HealthResponse(
             status="healthy",

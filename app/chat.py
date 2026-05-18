@@ -32,7 +32,7 @@ def main():
         
         # Load components
         print("\n📚 Loading retriever...")
-        retriever = get_retriever()
+        retriever, _ = get_retriever()
         
         print("🤖 Loading LLM...")
         llm = load_llm()

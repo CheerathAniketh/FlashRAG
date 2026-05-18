@@ -39,7 +39,7 @@ class RAGPipeline:
         Config.validate()
         
         # Load and cache retriever and LLM
-        self.retriever = get_retriever()
+        self.retriever, self.vector_db = get_retriever()
         self.llm = load_llm()
         
         # Initialize rate limiter for Groq retries
@@ -243,23 +243,30 @@ Answer:"""
     
     def get_indexed_chunks_count(self) -> int:
         """
-        Get the number of indexed chunks in the ChromaDB.
+        Get the number of indexed chunks in ChromaDB using public API.
+        
+        Uses Chroma.get() method to retrieve all documents and count them.
+        This properly queries the database instead of relying on private internals.
         
         Returns:
-            int: Number of chunks/documents in the database
+            int: Number of chunks/documents in the ChromaDB collection
             
         Raises:
-            RuntimeError: If unable to retrieve count
+            RuntimeError: If unable to retrieve count (but logs warning instead of raising)
         """
         try:
-            # Access the underlying Chroma collection to get document count
-            if hasattr(self.retriever, '_vectorstore'):
-                collection = self.retriever._vectorstore._collection
-                return collection.count()
+            # Use public Chroma API to get all documents
+            # get() with no filters returns all documents in the collection
+            results = self.vector_db.get()
             
-            # Fallback: try to count via the retriever's data
-            # This is a best-effort approach
+            if results and 'ids' in results:
+                count = len(results['ids'])
+                return count
+            
+            # If no results, return 0
             return 0
             
         except Exception as e:
-            raise RuntimeError(f"Failed to get indexed chunks count: {str(e)}")
+            # Log error but don't raise - return 0 for health check
+            print(f"⚠️  Warning: Failed to get indexed chunks count: {str(e)}")
+            return 0
