@@ -6,12 +6,13 @@ Pydantic models for request/response validation and documentation.
 
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from app.config import Config
 
 
 class ChatRequest(BaseModel):
     """Request model for the /api/chat endpoint."""
     
-    query: str = Field(..., min_length=1, max_length=2000, description="User's question or query")
+    query: str = Field(..., min_length=1, max_length=Config.MAX_QUERY_LENGTH, description="User's question or query")
     
     class Config:
         json_schema_extra = {

@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from typing import List
 
 # Load environment variables
 load_dotenv()
@@ -19,6 +20,18 @@ class Config:
     RETRIEVAL_K = 3
     CHUNK_SIZE = 1000
     CHUNK_OVERLAP = 200
+    
+    # API Request/Response Configs (MVP Production)
+    MAX_QUERY_LENGTH = 500
+    REQUEST_TIMEOUT = 35  # Seconds, longer than Groq timeout (30s)
+    GROQ_RETRY_ATTEMPTS = 3
+    
+    # CORS Configuration for MVP
+    FRONTEND_DOMAINS: List[str] = [
+        "http://localhost:3000",      # React dev server
+        "http://localhost:5173",      # Vite dev server
+        "https://yourdomain.com",     # Production domain (update this)
+    ]
     
     # Paths
     DATA_DIR = Path("data")

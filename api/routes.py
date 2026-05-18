@@ -1,9 +1,11 @@
 """
 API Routes and Endpoints
 
-Defines the REST API endpoints for the RAG system.
+Defines the REST API endpoints for the RAG system with async support,
+input validation, and enhanced error handling.
 """
 
+import asyncio
 from fastapi import APIRouter, HTTPException, UploadFile, File, status
 from typing import List
 import os
@@ -59,6 +61,12 @@ async def chat(request: ChatRequest) -> ChatResponse:
     """
     Chat endpoint - Process a user query and return an answer with sources.
     
+    Includes:
+    - Input validation (max 500 chars, min 1 char)
+    - Request timeout (35s, longer than Groq timeout)
+    - Exponential backoff retry for Groq rate limits
+    - User-friendly error messages
+    
     Args:
         request: ChatRequest containing the user's query
         
@@ -66,14 +74,36 @@ async def chat(request: ChatRequest) -> ChatResponse:
         ChatResponse: Generated answer, sources, and status
         
     Raises:
-        HTTPException: If query processing fails
+        HTTPException: If query processing fails with appropriate status codes
     """
     try:
+        # Validate query length
+        if len(request.query) > Config.MAX_QUERY_LENGTH:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Question too long. Maximum {Config.MAX_QUERY_LENGTH} characters allowed."
+            )
+        
+        if len(request.query) < 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Question cannot be empty."
+            )
+        
         # Get the RAG pipeline
         pipeline = get_rag_pipeline()
         
-        # Process the query
-        answer, sources = pipeline.query(request.query)
+        # Process the query with timeout
+        try:
+            answer, sources = await asyncio.wait_for(
+                pipeline.query_async(request.query),
+                timeout=Config.REQUEST_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            raise HTTPException(
+                status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                detail="Request took too long to process. Please try again."
+            )
         
         return ChatResponse(
             answer=answer,
@@ -81,23 +111,35 @@ async def chat(request: ChatRequest) -> ChatResponse:
             status="success"
         )
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except ValueError as e:
-        # Invalid input
+        # Invalid input (from validation)
+        error_msg = str(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail=error_msg if error_msg else "Invalid question provided."
         )
     except RuntimeError as e:
-        # Processing error
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process query: {str(e)}"
-        )
+        # Processing error - distinguish between rate limit and other errors
+        error_msg = str(e)
+        
+        if "rate limit" in error_msg.lower():
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Server is busy. Please try again in a few minutes."
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to process your question. Please try again."
+            )
     except Exception as e:
         # Unexpected error
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Internal server error: {str(e)}"
+            detail="An unexpected error occurred. Please try again."
         )
 
 
@@ -120,8 +162,7 @@ async def health() -> HealthResponse:
         try:
             indexed_chunks = pipeline.get_indexed_chunks_count()
         except Exception:
-            # If we can't get the count, assume it's 284 from the problem statement
-            # or attempt to count directly from ChromaDB
+            # If we can't get the count, return 0
             indexed_chunks = 0
         
         return HealthResponse(
@@ -132,7 +173,7 @@ async def health() -> HealthResponse:
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Service unavailable: {str(e)}"
+            detail="Service is not ready. Please try again later."
         )
 
 
@@ -153,7 +194,7 @@ async def ingest(files: List[UploadFile] = File(...)) -> IngestResponse:
     if not files:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No files provided"
+            detail="No files provided."
         )
     
     try:
@@ -198,7 +239,7 @@ async def ingest(files: List[UploadFile] = File(...)) -> IngestResponse:
             except Exception as e:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Failed to process file {file.filename}: {str(e)}"
+                    detail=f"Failed to process file {file.filename}. Please try again."
                 )
         
         return IngestResponse(
@@ -212,5 +253,5 @@ async def ingest(files: List[UploadFile] = File(...)) -> IngestResponse:
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Ingestion failed: {str(e)}"
+            detail="Ingestion failed. Please try again."
         )
