@@ -3,14 +3,14 @@ Ingestion script: Load PDF → Chunk → Embed → Store in ChromaDB
 
 Run this ONCE before using chat.py
 """
-
+print('started')
 from app.config import Config
 from utils.loader import load_pdf
 from utils.chunker import chunk_documents
 from core.embeddings import load_embedding_model
 from core.vectordb import store_vectors
 
-
+print('done importing')
 def ingest():
     """Run the full ingestion pipeline."""
     
