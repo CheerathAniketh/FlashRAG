@@ -13,7 +13,7 @@ class Config:
     
     # Model Configs
     EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-    LLM_MODEL = "llama-3.3-70b-versatile"
+    LLM_MODEL = "llama-3.1-8b-instant"
     LLM_TEMPERATURE = 0
     
     # Retrieval Configs
@@ -43,17 +43,17 @@ class Config:
         """Validate all critical configs on startup"""
         if not cls.GROQ_API_KEY:
             raise ValueError(
-                "❌ GROQ_API_KEY not found in .env file\n"
+                " GROQ_API_KEY not found in .env file\n"
                 "Create .env file with: GROQ_API_KEY=your_key_here"
             )
         
         if not cls.RAW_DIR.exists():
             raise FileNotFoundError(
-                f"❌ Data directory not found: {cls.RAW_DIR}\n"
+                f"Data directory not found: {cls.RAW_DIR}\n"
                 f"Create directory: mkdir -p {cls.RAW_DIR}"
             )
         
-        print("✅ Configuration validated")
+        print("Configuration validated")
         return True
 
 # For backward compatibility

@@ -31,19 +31,19 @@ def main():
         Config.validate()
         
         # Load components
-        print("\n📚 Loading retriever...")
+        print("\n Loading retriever...")
         retriever, _ = get_retriever()
         
-        print("🤖 Loading LLM...")
+        print("Loading LLM...")
         llm = load_llm()
         
-        print("\n✅ Ready for questions!\n")
+        print("\nReady for questions!\n")
         
     except (ValueError, FileNotFoundError, RuntimeError) as e:
         print(f"\n{e}")
         return
     except Exception as e:
-        print(f"\n❌ Unexpected error during startup: {e}")
+        print(f"\nUnexpected error during startup: {e}")
         return
     
     # Chat loop
@@ -75,7 +75,7 @@ Question:
 Answer:"""
             
             # Get response
-            print("\n🤖 Bot: ", end="", flush=True)
+            print("\n Bot: ", end="", flush=True)
             response = llm.invoke(prompt)
             print(response.content)
             
@@ -83,7 +83,7 @@ Answer:"""
             print("\n\n👋 Interrupted. Goodbye!")
             break
         except Exception as e:
-            print(f"\n❌ Error: {e}")
+            print(f"\nError: {e}")
             print("(Continuing...)\n")
 
 

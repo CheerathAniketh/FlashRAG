@@ -30,8 +30,8 @@ def store_vectors(chunks, embeddings):
             persist_directory=str(Config.CHROMA_DIR)
         )
         
-        print(f"✅ Stored {len(chunks)} chunks in ChromaDB")
+        print(f" Stored {len(chunks)} chunks in ChromaDB")
         return vector_db
         
     except Exception as e:
-        raise RuntimeError(f"❌ Failed to store vectors: {str(e)}")
+        raise RuntimeError(f"Failed to store vectors: {str(e)}")

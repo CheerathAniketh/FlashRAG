@@ -22,5 +22,38 @@ for i in {1..5}; do
     -d '{"query": "what is a queue?"}') &
 done
 wait
+
+seq 1 500 | xargs -I{} -P25 curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"query":"what is a queue?"}'
+
+
+
+  different questions
+  questions=(
+"What is a stack?"
+"Explain binary search."
+"What is a linked list?"
+"Explain recursion."
+"What is hashing?"
+)
+
+export questions
+
+seq 1 500 | xargs -I{} -P25 bash -c '
+arr=(
+"What is a stack?"
+"Explain binary search."
+"What is a linked list?"
+"Explain recursion."
+"What is hashing?"
+)
+
+q=${arr[$RANDOM % ${#arr[@]}]}
+
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d "{\"query\":\"$q\"}"
+'
 """
 

@@ -27,5 +27,5 @@ def chunk_documents(documents):
     
     chunks = text_splitter.split_documents(documents)
     
-    print(f"✅ Split into {len(chunks)} chunks")
+    print(f"Split into {len(chunks)} chunks")
     return chunks

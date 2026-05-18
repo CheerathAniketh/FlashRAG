@@ -26,7 +26,7 @@ def load_llm():
             temperature=Config.LLM_TEMPERATURE,
             timeout=30  # Prevent hanging
         )
-        print(f"✅ LLM loaded: {Config.LLM_MODEL}")
+        print(f"LLM loaded: {Config.LLM_MODEL}")
         return llm
         
     except Exception as e:

@@ -35,7 +35,7 @@ def load_pdf(pdf_path: str):
         if not documents:
             raise ValueError("❌ PDF loaded but contains no pages")
         
-        print(f"✅ Loaded PDF: {path.name} ({len(documents)} pages)")
+        print(f"Loaded PDF: {path.name} ({len(documents)} pages)")
         return documents
         
     except Exception as e:

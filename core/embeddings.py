@@ -18,7 +18,7 @@ def load_embedding_model():
             model_name=Config.EMBEDDING_MODEL,
             model_kwargs={"trust_remote_code": True}
         )
-        print(f"✅ Embeddings loaded: {Config.EMBEDDING_MODEL}")
+        print(f"Embeddings loaded: {Config.EMBEDDING_MODEL}")
         return embeddings
         
     except Exception as e:

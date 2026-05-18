@@ -36,7 +36,7 @@ def get_retriever() -> Tuple:
             search_kwargs={"k": Config.RETRIEVAL_K}
         )
         
-        print(f"✅ Retriever loaded (k={Config.RETRIEVAL_K})")
+        print(f"Retriever loaded (k={Config.RETRIEVAL_K})")
         return retriever, vector_db
         
     except Exception as e:
