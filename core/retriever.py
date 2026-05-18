@@ -1,14 +1,17 @@
 from langchain_chroma import Chroma
 from core.embeddings import load_embedding_model
 from app.config import Config
+from typing import Tuple
 
 
-def get_retriever():
+def get_retriever() -> Tuple:
     """
     Load ChromaDB and create retriever.
     
     Returns:
-        Retriever: LangChain retriever with k=3 similarity search
+        Tuple containing:
+        - retriever: LangChain retriever with k=3 similarity search
+        - vector_db: Chroma vector database instance for direct access
         
     Raises:
         FileNotFoundError: If ChromaDB not found (run ingest.py first)
@@ -34,7 +37,7 @@ def get_retriever():
         )
         
         print(f"✅ Retriever loaded (k={Config.RETRIEVAL_K})")
-        return retriever
+        return retriever, vector_db
         
     except Exception as e:
         raise RuntimeError(f"❌ Failed to load ChromaDB: {str(e)}")
